@@ -1,0 +1,24 @@
+{
+  "name": "ai-notepad-server",
+  "version": "1.0.0",
+  "description": "AI记事本后端API服务",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "openai": "^4.20.1",
+    "fs-extra": "^11.1.1",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  },
+  "keywords": ["express", "api", "openai", "notepad"],
+  "author": "Your Name",
+  "license": "MIT"
+}
