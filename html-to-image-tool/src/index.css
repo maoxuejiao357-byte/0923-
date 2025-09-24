@@ -1,0 +1,23 @@
+/* 引入 Tailwind 的基础样式 */
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+/* 引入 Tailwind 的实用工具类 */
+@import 'tailwindcss/utilities';
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+.preview-container {
+  min-height: 100px;
+}

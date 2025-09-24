@@ -1,0 +1,36 @@
+{
+  "name": "html-to-image-tool",
+  "version": "1.0.0",
+  "description": "HTML转图片小工具",
+  "main": "index.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "start": "vite"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "@uiw/react-codemirror": "^4.21.21",
+    "@codemirror/lang-html": "^6.4.6",
+    "html2canvas": "^1.4.1"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.37",
+    "@types/react-dom": "^18.2.15",
+    "@vitejs/plugin-react": "^4.1.0",
+    "autoprefixer": "^10.4.16",
+    "postcss": "^8.4.31",
+    "tailwindcss": "^3.3.5",
+    "vite": "^4.5.0"
+  },
+  "keywords": [
+    "html",
+    "image",
+    "converter",
+    "react"
+  ],
+  "author": "",
+  "license": "MIT"
+}
