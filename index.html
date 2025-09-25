@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI智能记事本</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>🤖 AI智能记事本</h1>
+            <div class="search-bar">
+                <input type="text" id="searchInput" placeholder="搜索笔记...">
+                <button onclick="searchNotes()">🔍</button>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <!-- 左侧笔记列表 -->
+            <aside class="sidebar">
+                <div class="note-controls">
+                    <button onclick="createNewNote()" class="btn-primary">➕ 新建笔记</button>
+                    <button onclick="exportNotes()" class="btn-secondary">📤 导出</button>
+                    <button onclick="importNotes()" class="btn-secondary">📥 导入</button>
+                </div>
+                
+                <div class="notes-list" id="notesList">
+                    <!-- 笔记列表将在这里动态生成 -->
+                </div>
+            </aside>
+
+            <!-- 右侧编辑区域 -->
+            <main class="editor-area">
+                <div class="editor-controls">
+                    <input type="text" id="noteTitle" placeholder="笔记标题..." class="title-input">
+                    <div class="ai-controls">
+                        <button onclick="generateTags()" class="ai-btn">🏷️ 生成标签</button>
+                        <button onclick="polishContent()" class="ai-btn">✨ 润色文本</button>
+                        <button onclick="summarizeContent()" class="ai-btn">📋 生成摘要</button>
+                    </div>
+                </div>
+                
+                <div class="tag-section">
+                    <input type="text" id="tagInput" placeholder="添加标签...">
+                    <button onclick="addTag()" class="btn-small">添加</button>
+                    <div class="tags-container" id="tagsContainer"></div>
+                </div>
+
+                <textarea id="noteContent" placeholder="开始写作...
+
+快捷键：
+Ctrl+S: 保存笔记
+Ctrl+Enter: 新建笔记
+
+🚀 AI功能已启用，可以使用上方的AI工具！" class="content-editor"></textarea>
+
+                <div class="editor-footer">
+                    <span id="wordCount">字数：0</span>
+                    <span id="lastSaved">未保存</span>
+                    <button onclick="saveNote()" class="btn-save">💾 保存</button>
+                </div>
+            </main>
+        </div>
+
+        <!-- AI面板 -->
+        <div class="ai-panel" id="aiPanel">
+            <h3>🤖 AI助手</h3>
+            <div class="ai-controls">
+                <select id="aiFunction">
+                    <option value="polish">文本润色</option>
+                    <option value="rewrite">文本改写</option>
+                    <option value="summarize">生成摘要</option>
+                    <option value="translate">翻译文本</option>
+                </select>
+                <button onclick="executeAIFunction()" class="btn-ai">执行</button>
+            </div>
+            <div class="ai-result" id="aiResult"></div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
-import { notesDB } from '../services/database';
+import { notesAPI } from '../services/localStorage';
 
 const NotesContext = createContext();
 
@@ -45,32 +45,32 @@ function notesReducer(state, action) {
 export function NotesProvider({ children }) {
   const [state, dispatch] = useReducer(notesReducer, initialState);
 
-  // 加载笔记
+  // 加载笔记（使用本地存储API）
   const loadNotes = async () => {
     try {
       dispatch({ type: 'SET_LOADING', payload: true });
-      const notes = await notesDB.getAllNotes();
-      dispatch({ type: 'SET_NOTES', payload: notes });
+      const response = await notesAPI.getAllNotes();
+      
+      if (response.success) {
+        dispatch({ type: 'SET_NOTES', payload: response.data });
+      } else {
+        throw new Error('加载笔记失败');
+      }
     } catch (error) {
       dispatch({ type: 'SET_ERROR', payload: error.message });
     }
   };
 
   // 创建笔记
-  const createNote = async (noteData) => {
+  const createNote = async (note) => {
     try {
-      const newNote = {
-        id: Date.now().toString(),
-        title: noteData.title || '新笔记',
-        content: noteData.content || '',
-        tags: noteData.tags || [],
-        createdAt: new Date(),
-        updatedAt: new Date()
-      };
-      
-      await notesDB.addNote(newNote);
-      dispatch({ type: 'ADD_NOTE', payload: newNote });
-      return newNote;
+      const response = await notesAPI.createNote(note);
+      if (response.success) {
+        dispatch({ type: 'ADD_NOTE', payload: response.data });
+        return response.data;
+      } else {
+        throw new Error('创建笔记失败');
+      }
     } catch (error) {
       dispatch({ type: 'SET_ERROR', payload: error.message });
       throw error;
@@ -80,15 +80,13 @@ export function NotesProvider({ children }) {
   // 更新笔记
   const updateNote = async (id, updates) => {
     try {
-      const updatedNote = {
-        ...updates,
-        id,
-        updatedAt: new Date()
-      };
-      
-      await notesDB.updateNote(id, updatedNote);
-      dispatch({ type: 'UPDATE_NOTE', payload: updatedNote });
-      return updatedNote;
+      const response = await notesAPI.updateNote(id, updates);
+      if (response.success) {
+        dispatch({ type: 'UPDATE_NOTE', payload: response.data });
+        return response.data;
+      } else {
+        throw new Error('更新笔记失败');
+      }
     } catch (error) {
       dispatch({ type: 'SET_ERROR', payload: error.message });
       throw error;
@@ -98,52 +96,52 @@ export function NotesProvider({ children }) {
   // 删除笔记
   const deleteNote = async (id) => {
     try {
-      await notesDB.deleteNote(id);
-      dispatch({ type: 'DELETE_NOTE', payload: id });
+      const response = await notesAPI.deleteNote(id);
+      if (response.success) {
+        dispatch({ type: 'DELETE_NOTE', payload: id });
+      } else {
+        throw new Error('删除笔记失败');
+      }
     } catch (error) {
       dispatch({ type: 'SET_ERROR', payload: error.message });
       throw error;
     }
   };
 
-  // 搜索笔记
-  const searchNotes = (query) => {
+  // 设置搜索查询
+  const setSearchQuery = (query) => {
     dispatch({ type: 'SET_SEARCH_QUERY', payload: query });
   };
 
-  // 按标签筛选
-  const filterByTags = (tags) => {
+  // 设置选中的标签
+  const setSelectedTags = (tags) => {
     dispatch({ type: 'SET_SELECTED_TAGS', payload: tags });
   };
 
   // 获取过滤后的笔记
   const getFilteredNotes = () => {
-    let filtered = state.notes;
+    return state.notes.filter(note => {
+      // 搜索过滤
+      if (state.searchQuery) {
+        const query = state.searchQuery.toLowerCase();
+        const matchesSearch = 
+          note.title.toLowerCase().includes(query) ||
+          note.content.toLowerCase().includes(query) ||
+          (note.tags && note.tags.some(tag => tag.toLowerCase().includes(query)));
+        
+        if (!matchesSearch) return false;
+      }
 
-    // 按搜索查询过滤
-    if (state.searchQuery) {
-      const query = state.searchQuery.toLowerCase();
-      filtered = filtered.filter(note => 
-        note.title.toLowerCase().includes(query) ||
-        note.content.toLowerCase().includes(query) ||
-        note.tags.some(tag => tag.toLowerCase().includes(query))
-      );
-    }
+      // 标签过滤
+      if (state.selectedTags.length > 0) {
+        const hasSelectedTag = state.selectedTags.some(tag => 
+          note.tags && note.tags.includes(tag)
+        );
+        if (!hasSelectedTag) return false;
+      }
 
-    // 按标签过滤
-    if (state.selectedTags.length > 0) {
-      filtered = filtered.filter(note => 
-        state.selectedTags.every(tag => note.tags.includes(tag))
-      );
-    }
-
-    return filtered;
-  };
-
-  // 获取所有标签
-  const getAllTags = () => {
-    const allTags = state.notes.flatMap(note => note.tags);
-    return [...new Set(allTags)].sort();
+      return true;
+    });
   };
 
   // 初始化时加载笔记
@@ -152,15 +150,18 @@ export function NotesProvider({ children }) {
   }, []);
 
   const value = {
-    ...state,
+    notes: state.notes,
+    loading: state.loading,
+    error: state.error,
+    searchQuery: state.searchQuery,
+    selectedTags: state.selectedTags,
+    loadNotes,
     createNote,
     updateNote,
     deleteNote,
-    searchNotes,
-    filterByTags,
-    getFilteredNotes,
-    getAllTags,
-    loadNotes
+    setSearchQuery,
+    setSelectedTags,
+    getFilteredNotes
   };
 
   return (
@@ -173,7 +174,7 @@ export function NotesProvider({ children }) {
 export function useNotes() {
   const context = useContext(NotesContext);
   if (!context) {
-    throw new Error('useNotes must be used within a NotesProvider');
+    throw new Error('useNotes必须在NotesProvider中使用');
   }
   return context;
 }
